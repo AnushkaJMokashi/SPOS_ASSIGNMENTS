@@ -1,0 +1,49 @@
+import java.util.Arrays;
+
+public class best_Fit {
+	
+	void bestFit(int blockSize[] , int m , int processSize[] , int n) {
+		
+		int allocation[] = new int[n];
+		
+		Arrays.fill(allocation, -1);
+		
+		
+		for(int i = 0; i < n ; i++) {
+			int bstIdx = -1;
+			
+			for(int j = 0 ; i< m ; j++) {
+				
+				if(blockSize[j] >= processSize[i]) {
+					
+					if(bstIdx == -1) {
+						bstIdx = j;
+					}
+					else if(blockSize[bstIdx]> blockSize[j]) {
+						bstIdx = j;				
+					}
+					
+				}
+			}
+			
+			//current process allocation
+			if(bstIdx != -1) {
+				allocation[i] = bstIdx;
+				blockSize[bstIdx] -= processSize[i];
+			}
+		}
+		
+		System.out.println();
+		System.out.println("/nProcess NO. /tProcess Size /t BLock No");
+		for(int i = 0 ; i < n ; i++) {
+			System.out.println("/n" + (i+1) +"\t\t"+ processSize[i] + "\t\t" +(allocation[i]+1));
+		}
+		System.out.println();
+		
+		
+		
+	}
+
+}
+//==========================================================
+

@@ -1,0 +1,87 @@
+import java.util.Scanner;
+
+class first_Fit {
+	void firstFit(int blockSize[], int m , int processSize[] , int n) {
+		int allocation[] = new int[n];
+		
+		for(int i = 0 ; i < allocation.length ; i++) {
+			allocation[i] = -1;
+		}
+		
+		for(int i = 0 ; i < n ; i++) {
+			for(int j = 0 ; j<m ; j++) {
+				if(blockSize[j] >= processSize[i]) {
+					allocation[i] = j;
+					blockSize[j] = blockSize[j] - processSize[i];
+					break;
+				}
+			}
+		}
+		
+		System.out.println("\nProcess No. \tProcess Size \t Block No");
+		for(int i = 0 ; i < n ; i++) {
+			System.out.println(" "+"\t\t" +processSize[i] + "\t\t" + "\t\t");
+			if(allocation[i] != -1) {
+				System.out.println(allocation[i] +1);
+			}else {
+				System.out.println("Not Allocated");
+			}
+			
+			System.out.println(" ");
+			
+		}
+	}
+}
+
+
+//==================================================================
+import java.util.Arrays;
+
+public class worst_Fit {
+	
+	void worstFit(int blockSize[] , int m , int processSize[] , int n) {
+		int allocation[] = new int[n];
+		
+		Arrays.fill(allocation , -1);
+		
+		for(int i = 0 ; i < n ; i++) {
+			int wstIdx = -1;
+			
+			//to find worst Index
+			for(int j = 0 ; j< m ; i++) {
+				
+				if(blockSize[j] >= processSize[i]) {
+					if(wstIdx == -1) {
+						wstIdx = j;
+					}
+					else if(blockSize[wstIdx] < blockSize[j]) {
+						wstIdx = j;
+					}
+				}
+			}
+			
+			//Current process block
+			if(wstIdx != -1) {
+				
+				allocation[i] = wstIdx;
+				blockSize[wstIdx] -= processSize[i];
+			}
+			
+			
+		}
+		
+		//print
+		
+		System.out.println("\nProcess no. \tProcess Size \tBlock no. ");
+		for(int i = 0 ; i<n ; i++) {
+			System.out.println(" " + (i+1) + "\t\t" + processSize[i] + "\t\t");
+			if(allocation[i] !=-1)
+				System.out.print(allocation[i] +1);
+			else
+				System.out.println("Not Allocated");
+			System.out.println();
+		}
+	}
+}
+//===================================================================
+

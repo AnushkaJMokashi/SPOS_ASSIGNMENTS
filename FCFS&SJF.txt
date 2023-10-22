@@ -1,0 +1,230 @@
+import java.util.Scanner;
+
+public class FCFS {
+	
+	public void FCFS_algo() {
+		
+		Scanner sc = new Scanner(System.in);
+		int n;
+		System.out.println("Enter the no. of processes: ");
+		n = sc.nextInt();
+		
+		int pid[] = new int[n];
+		int at[] = new int[n];
+		int bt[] = new int[n];
+		int ct[] = new int[n];
+		int tat[] = new int[n];
+		int wt[] = new int[n];
+		
+		int avgtat = 0;
+		int avgwt = 0;
+		//accept pid , at, bt
+		
+		for(int i = 0 ; i < n ; i++) {
+			System.out.println("Process : "+ (i+1));
+			System.out.print("AT : ");
+			at[i] = sc.nextInt();
+			System.out.println("BT : ");
+			bt[i] = sc.nextInt();
+		}
+		
+		int temp = 0;
+		//sort according to the AT
+		for(int i = 0 ; i<n ; i++) {
+			for(int j  = 0 ; j<n-(i+1) ; j++) {
+				if(at[j] > at[j+1]) {
+					
+					temp = at[j];
+					at[j] = at[j+1];
+					at[j+1] = temp;
+					
+					temp = bt[j];
+					bt[j] = bt[j+1];
+					bt[j+1] = temp;
+					
+					temp = pid[j];
+					pid[j] = pid[j+1];
+					pid[j+1] = temp;
+					
+				}
+			}
+			
+		}
+		
+		
+		//CT
+		for(int i = 0 ; i< n ; i++) {
+			if(i == 0) {
+				ct[i] = at[i] + bt[i];
+			}
+			else {
+				if(at[i] > ct[i-1]) {
+					ct[i] = at[i] + bt[i];
+				}
+				else {
+					ct[i] = ct[i-1] + bt[i];
+				}
+			}
+			
+			tat[i] = ct[i] - at[i];
+			wt[i] = tat[i] - bt[i];
+			
+			avgtat += tat[i];
+			avgwt += wt[i];
+			
+		}
+		
+		//print
+		
+		System.out.println("/n Process Id \tAT \tBT \tCT \tTAT \tWT");
+		for(int i = 0 ; i < n ; i++) {
+			System.out.println(pid[i]+ "\t\t\t" + at[i] + "\t\t\t" + bt[i] + "\t\t\t" + ct[i] + "\t\t\t" + tat[i] + "\t\t\t" + wt[i] +"\n");
+		}
+		
+		System.out.println("AVG TAT: "+avgtat/n);
+		System.out.println("AVG WT: "+avgwt/n);
+		
+		
+		
+	}
+	public static void main(String[] args) {
+		FCFS f = new FCFS();
+		f.FCFS_algo();
+
+	}
+
+}
+
+
+//======================================================================
+class Process 
+{ 
+    int pid; // Process ID 
+    int bt; // Burst Time 
+    int art; // Arrival Time 
+      
+    public Process(int pid, int bt, int art) 
+    { 
+        this.pid = pid; 
+        this.bt = bt; 
+        this.art = art; 
+    } 
+} 
+  
+public class SJF  
+{ 
+    
+    static void findWaitingTime(Process proc[], int n, 
+                                     int wt[]) 
+    { 
+        int rt[] = new int[n]; 
+       
+        
+        for (int i = 0; i < n; i++) 
+            rt[i] = proc[i].bt; 
+       
+        int complete = 0, t = 0, minm = Integer.MAX_VALUE; 
+        int shortest = 0, finish_time; 
+        boolean check = false; 
+       
+        
+        while (complete != n) { 
+       
+            
+            for (int j = 0; j < n; j++)  
+            { 
+                if ((proc[j].art <= t) && 
+                  (rt[j] < minm) && rt[j] > 0) { 
+                    minm = rt[j]; 
+                    shortest = j; 
+                    check = true; 
+                } 
+            } 
+       
+            if (check == false) { 
+                t++; 
+                continue; 
+            } 
+       
+            
+            rt[shortest]--; 
+       
+            
+            minm = rt[shortest]; 
+            if (minm == 0) 
+                minm = Integer.MAX_VALUE; 
+       
+            
+            if (rt[shortest] == 0) { 
+       
+                
+                complete++; 
+                check = false; 
+       
+                
+                finish_time = t + 1; 
+       
+                
+                wt[shortest] = finish_time - 
+                             proc[shortest].bt - 
+                             proc[shortest].art; 
+       
+                if (wt[shortest] < 0) 
+                    wt[shortest] = 0; 
+            } 
+            
+            t++; 
+        } 
+    } 
+       
+ 
+    static void findTurnAroundTime(Process proc[], int n, 
+                            int wt[], int tat[]) 
+    { 
+        
+        for (int i = 0; i < n; i++) 
+            tat[i] = proc[i].bt + wt[i]; 
+    } 
+       
+    
+    static void findavgTime(Process proc[], int n) 
+    { 
+        int wt[] = new int[n], tat[] = new int[n]; 
+        int  total_wt = 0, total_tat = 0; 
+       
+        
+        findWaitingTime(proc, n, wt); 
+       
+        findTurnAroundTime(proc, n, wt, tat); 
+       
+        System.out.println("Processes " + 
+                           " Burst time " + 
+                           " Waiting time " + 
+                           " Turn around time"); 
+       
+        
+        for (int i = 0; i < n; i++) { 
+            total_wt = total_wt + wt[i]; 
+            total_tat = total_tat + tat[i]; 
+            System.out.println(" " + proc[i].pid + "\t\t"
+                             + proc[i].bt + "\t\t " + wt[i] 
+                             + "\t\t" + tat[i]); 
+        } 
+       
+        System.out.println("Average waiting time = " + 
+                          (float)total_wt / (float)n); 
+        System.out.println("Average turn around time = " + 
+                           (float)total_tat / (float)n); 
+    } 
+      
+    // Driver Method 
+    public static void main(String[] args) 
+    { 
+         Process proc[] = { new Process(1, 6, 1),  
+                            new Process(2, 8, 1), 
+                            new Process(3, 7, 2),  
+                            new Process(4, 3, 3)}; 
+          
+         findavgTime(proc, proc.length); 
+    } 
+} 

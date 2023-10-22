@@ -1,0 +1,192 @@
+import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.StringTokenizer;
+
+public class Pass2 {
+
+    public static HashMap<String, ArrayList<String>> mnemonics = new HashMap<String, ArrayList<String>>();
+    public static HashMap<Integer, ArrayList<String>> symbolTable = new HashMap<Integer, ArrayList<String>>();
+    public static HashMap<Integer, ArrayList<String>> litTable = new HashMap<Integer, ArrayList<String>>();
+    public static HashMap<String, Integer> registers = new HashMap<String, Integer>();
+    public static int lc = 0;
+
+    Pass2() {
+        registers.put("A", 1);
+        registers.put("B", 2);
+        registers.put("C", 3);
+        registers.put("D", 4);
+
+    }
+
+    public static String[] convertIntoArray(String InputFileName) {
+        String[] arr2 = {};
+        try {
+            FileInputStream in = new FileInputStream("D:/SPOS/spos2/lib/" + InputFileName + ".txt");
+            String str = "";
+            int i = in.read();
+            while (i != -1) {
+                str += (char) i;
+                i = in.read();
+            }
+            in.close();
+            String newStr = "";
+            StringTokenizer token = new StringTokenizer(str, " ");
+            while (token.hasMoreTokens()) {
+                newStr += token.nextToken() + " ";
+            }
+            newStr = newStr.toString();
+            arr2 = newStr.split("\n");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return arr2;
+    }
+
+    public static void createMnemonics() {
+        String[] arr = convertIntoArray("mot");
+        for (int i = 0; i < arr.length; i++) {
+            ArrayList<String> temp = new ArrayList<String>();
+            String key = arr[i].split(" ")[0];
+            temp.add(arr[i].split(" ")[1]);
+            temp.add(arr[i].split(" ")[2]);
+            temp.add(arr[i].split(" ")[3]);
+            mnemonics.put(key, temp);
+        }
+    }
+
+    public static void createSymbolTable() {
+        String[] arr = convertIntoArray("symtable");
+        for (int i = 0; i < arr.length; i++) {
+            ArrayList<String> temp = new ArrayList<String>();
+            Integer key = Integer.parseInt(arr[i].split(" ")[0]);
+            temp.add(arr[i].split(" ")[1]);
+            temp.add(arr[i].split(" ")[2]);
+            symbolTable.put(key, temp);
+        }
+    }
+
+    public static void createLiteralTable() {
+        String[] arr = convertIntoArray("littable");
+        for (int i = 0; i < arr.length; i++) {
+            ArrayList<String> temp = new ArrayList<String>();
+            Integer key = Integer.parseInt(arr[i].split(" ")[0]);
+            temp.add(arr[i].split(" ")[1]);
+            temp.add(arr[i].split(" ")[2]);
+            litTable.put(key, temp);
+        }
+    }
+
+    public static void generateMC() {
+        createMnemonics();
+        createSymbolTable();
+        createLiteralTable();
+        String[] InputIC = convertIntoArray("input_ic");
+        String st = "";
+        for (int i = 0; i < InputIC.length; i++) {
+            ArrayList<String> temp = new ArrayList<String>();
+            String s = InputIC[i].trim();
+            StringTokenizer token = new StringTokenizer(s, " ");
+
+            while (token.hasMoreTokens()) {
+                temp.add(token.nextToken());
+            }
+
+            int TokenCount = temp.size();
+
+            if (TokenCount == 1)
+                continue;
+            else if (TokenCount == 2) {
+
+                st += temp.get(0) + " ";
+                st += temp.get(1);
+
+            } else if (TokenCount == 3) {
+
+                st += temp.get(0) + " ";
+                st += temp.get(1).substring(1, 3) + " ";
+                String testToken = temp.get(2);
+                String si = "";
+                for (int j = 3; (testToken.charAt(j) != ')' && j < testToken.length()); j++) {
+                    si += testToken.charAt(j);
+                }
+                st += si;
+
+            } else if (TokenCount == 4) {
+                st += temp.get(0) + " ";
+                st += temp.get(1).substring(1, 3) + " ";
+
+                String operand1 = temp.get(2);
+
+                if (operand1.charAt(0) == '1' ||
+                        operand1.charAt(0) == '2' ||
+                        operand1.charAt(0) == '3' ||
+                        operand1.charAt(0) == '4') {  //1,2,3,4 register nos
+
+                    st += operand1 + " ";
+
+                } else if (operand1.charAt(1) == 'L') {
+
+                    String si = "";
+                    for (int j = 3; (operand1.charAt(j) != ')' && j < operand1.length()); j++) {
+                        si += operand1.charAt(j);
+                    }
+                    int index = Integer.parseInt(si);
+                    st += litTable.get(index).get(1) + " ";
+
+                } else if (operand1.charAt(1) == 'S') {
+
+                    String si = "";
+                    for (int j = 3; (operand1.charAt(j) != ')' && j < operand1.length()); j++) {
+                        si += operand1.charAt(j);
+                    }
+                    int index = Integer.parseInt(si);
+                    st += symbolTable.get(index).get(1) + " ";
+
+                } else if (operand1.charAt(1) == 'C') {
+                    String si = "";
+                    for (int j = 3; (operand1.charAt(j) != ')' && j < operand1.length()); j++) {
+                        si += operand1.charAt(j);
+                    }
+                    st += si;
+                }
+
+                String operand2 = temp.get(3);
+
+                if (operand2.charAt(1) == 'L') {
+
+                    String si = "";
+                    for (int j = 3; (operand2.charAt(j) != ')' && j < operand2.length()); j++) {
+                        si += operand2.charAt(j);
+                    }
+                    int index = Integer.parseInt(si);
+                    st += litTable.get(index).get(1) + " ";
+
+                } else if (operand2.charAt(1) == 'S') {
+
+                    String si = "";
+                    for (int j = 3; (operand2.charAt(j) != ')' && j < operand2.length()); j++) {
+                        si += operand2.charAt(j);
+                    }
+                    int index = Integer.parseInt(si);
+                    st += symbolTable.get(index).get(1) + " ";
+
+                } else if (operand2.charAt(1) == 'C') {
+                    String si = "";
+                    for (int j = 3; (operand2.charAt(j) != ')' && j < operand2.length()); j++) {
+                        si += operand2.charAt(j);
+                    }
+                    st += si;
+                }
+
+            }
+            st += "\n";
+        }
+        System.out.println(st);
+    }
+
+    public static void main(String[] args) throws Exception {
+        Pass2 p = new Pass2();
+        p.generateMC();
+    }
+}
