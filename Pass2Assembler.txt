@@ -1,9 +1,10 @@
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
-public class Pass2 {
+public class App {
 
     public static HashMap<String, ArrayList<String>> mnemonics = new HashMap<String, ArrayList<String>>();
     public static HashMap<Integer, ArrayList<String>> symbolTable = new HashMap<Integer, ArrayList<String>>();
@@ -11,12 +12,11 @@ public class Pass2 {
     public static HashMap<String, Integer> registers = new HashMap<String, Integer>();
     public static int lc = 0;
 
-    Pass2() {
+    App() {
         registers.put("A", 1);
         registers.put("B", 2);
         registers.put("C", 3);
         registers.put("D", 4);
-
     }
 
     public static String[] convertIntoArray(String InputFileName) {
@@ -121,7 +121,7 @@ public class Pass2 {
                 if (operand1.charAt(0) == '1' ||
                         operand1.charAt(0) == '2' ||
                         operand1.charAt(0) == '3' ||
-                        operand1.charAt(0) == '4') {  //1,2,3,4 register nos
+                        operand1.charAt(0) == '4') {
 
                     st += operand1 + " ";
 
@@ -180,13 +180,22 @@ public class Pass2 {
                 }
 
             }
-            st += "\n";
+            if (TokenCount != 1)
+                st += "\n";
         }
         System.out.println(st);
+        try {
+            FileOutputStream pass2output = new FileOutputStream("./pass2.txt");
+            pass2output.write(st.getBytes());
+            pass2output.close();
+        } catch (Exception e) {
+            System.out.println(e);// TODO: handle exception
+        }
+
     }
 
     public static void main(String[] args) throws Exception {
-        Pass2 p = new Pass2();
-        p.generateMC();
+        App ap = new App();
+        ap.generateMC();
     }
 }
